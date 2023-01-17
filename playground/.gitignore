@@ -4,6 +4,7 @@
 logs
 **/*.backup.*
 **/*.back.*
+yarn.lock
 .idea
 
 node_modules
