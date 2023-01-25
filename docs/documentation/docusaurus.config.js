@@ -27,7 +27,7 @@ const config = {
   ],
   presets: [
     [
-      '@docusaurus/preset-classic',
+      "docusaurus-preset-openapi",
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
@@ -46,6 +46,10 @@ const config = {
           blogSidebarCount: 50,
           blogSidebarTitle: 'Recent posts',
           routeBasePath: 'blog',
+        },
+        api: {
+          path: "apidocs.swagger.json",
+          routeBasePath: "/api",
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

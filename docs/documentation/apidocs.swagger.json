@@ -1,0 +1,1527 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Permify API",
+    "description": "Permify is an open-source authorization service for creating and maintaining\nfine-grained authorizations across your individual applications and\nservices. Permify converts authorization data as relational tuples into a\ndatabase you point at. We called that database a Write Database (WriteDB)\nand it behaves as a centralized data source for your authorization system.\nYou can model of your authorization with Permify's DSL - Permify Schema -\nand perform access checks with a single API call anywhere on your stack.\nAccess decisions made according to stored relational tuples.",
+    "version": "v0.3.0",
+    "contact": {
+      "name": "API Support",
+      "url": "https://github.com/Permify/permify/issues",
+      "email": "hello@permify.co"
+    },
+    "license": {
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://github.com/Permify/permify/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "Permission"
+    },
+    {
+      "name": "Schema"
+    },
+    {
+      "name": "Relationship"
+    },
+    {
+      "name": "Tenancy"
+    },
+    {
+      "name": "Welcome"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "welcome to permify",
+        "operationId": "welcome.hello",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/welcomeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Welcome"
+        ]
+      }
+    },
+    "/v1/tenants/create": {
+      "post": {
+        "summary": "create new tenant",
+        "operationId": "tenants.create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantCreateResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Tenancy"
+        ]
+      }
+    },
+    "/v1/tenants/list": {
+      "post": {
+        "summary": "list tenants",
+        "operationId": "tenants.list",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantListResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenantListRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Tenancy"
+        ]
+      }
+    },
+    "/v1/tenants/{id}": {
+      "delete": {
+        "summary": "delete tenant",
+        "operationId": "tenants.delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDeleteResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Tenancy"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/permissions/check": {
+      "post": {
+        "summary": "This method returns a decision about whether user can perform an action\non a certain resource. For example, Can the user 1 push to repository 1?",
+        "operationId": "permissions.check",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionCheckResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/PermissionCheckRequestMetadata"
+                  },
+                  "entity": {
+                    "$ref": "#/components/schemas/Entity"
+                  },
+                  "permission": {
+                    "type": "string",
+                    "title": "its can be action or relation"
+                  },
+                  "subject": {
+                    "$ref": "#/components/schemas/Subject"
+                  }
+                },
+                "title": "PermissionCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/permissions/expand": {
+      "post": {
+        "summary": "expand relationships according to schema",
+        "operationId": "permissions.expand",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionExpandResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/PermissionExpandRequestMetadata"
+                  },
+                  "entity": {
+                    "$ref": "#/components/schemas/Entity"
+                  },
+                  "permission": {
+                    "type": "string"
+                  }
+                },
+                "title": "PermissionExpandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/permissions/lookup-entity": {
+      "post": {
+        "operationId": "permissions.lookupEntity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionLookupEntityResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/permissions.lookupEntityBody"
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/permissions/lookup-entity-stream": {
+      "post": {
+        "operationId": "permissions.lookupEntityStream",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/components/schemas/PermissionLookupEntityStreamResponse"
+                    },
+                    "error": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  },
+                  "title": "Stream result of PermissionLookupEntityStreamResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/permissions.lookupEntityBody"
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/permissions/lookup-schema": {
+      "post": {
+        "operationId": "permissions.lookupSchema",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionLookupSchemaResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/PermissionLookupSchemaRequestMetadata"
+                  },
+                  "entity_type": {
+                    "type": "string"
+                  },
+                  "relation_names": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "title": "PermissionLookupSchemaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/relationships/delete": {
+      "post": {
+        "summary": "delete relation tuple",
+        "operationId": "relationships.delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipDeleteResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filter": {
+                    "$ref": "#/components/schemas/TupleFilter"
+                  }
+                },
+                "title": "RelationshipDeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Relationship"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/relationships/read": {
+      "post": {
+        "summary": "read relation tuple(s)",
+        "operationId": "relationships.read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipReadResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/RelationshipReadRequestMetadata"
+                  },
+                  "filter": {
+                    "$ref": "#/components/schemas/TupleFilter"
+                  },
+                  "page_size": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "continuous_token": {
+                    "type": "string"
+                  }
+                },
+                "title": "RelationshipReadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Relationship"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/relationships/write": {
+      "post": {
+        "summary": "create new relation tuple",
+        "operationId": "relationships.write",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipWriteResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/RelationshipWriteRequestMetadata"
+                  },
+                  "tuples": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Tuple"
+                    }
+                  }
+                },
+                "title": "RelationshipWriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Relationship"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/schemas/read": {
+      "post": {
+        "summary": "read your authorization model",
+        "operationId": "schemas.read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaReadResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/SchemaReadRequestMetadata"
+                  }
+                },
+                "title": "SchemaReadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Schema"
+        ]
+      }
+    },
+    "/v1/tenants/{tenant_id}/schemas/write": {
+      "post": {
+        "summary": "write your authorization model",
+        "operationId": "schemas.write",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaWriteResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "string"
+                  }
+                },
+                "title": "SchemaWriteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "tags": [
+          "Schema"
+        ]
+      }
+    }
+  },
+  "components": {
+    "requestBodies": {
+      "permissions.lookupEntityBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "metadata": {
+                  "$ref": "#/components/schemas/PermissionLookupEntityRequestMetadata"
+                },
+                "entity_type": {
+                  "type": "string"
+                },
+                "permission": {
+                  "type": "string"
+                },
+                "subject": {
+                  "$ref": "#/components/schemas/Subject"
+                }
+              },
+              "title": "PermissionLookupEntityRequest"
+            }
+          }
+        },
+        "required": true
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "ActionDefinition": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "child": {
+            "$ref": "#/components/schemas/Child"
+          }
+        },
+        "title": "ActionDefinition"
+      },
+      "Any": {
+        "type": "object",
+        "properties": {
+          "@type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {}
+      },
+      "Child": {
+        "type": "object",
+        "properties": {
+          "leaf": {
+            "$ref": "#/components/schemas/Leaf"
+          },
+          "rewrite": {
+            "$ref": "#/components/schemas/Rewrite"
+          }
+        },
+        "title": "Child"
+      },
+      "ComputedUserSet": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          }
+        },
+        "title": "ComputedUserSet"
+      },
+      "Entity": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "title": "Entity"
+      },
+      "EntityAndRelation": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Entity"
+          },
+          "relation": {
+            "type": "string"
+          }
+        }
+      },
+      "EntityDefinition": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "relations": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RelationDefinition"
+            },
+            "title": "[\"relation_name\"] => RelationDefinition"
+          },
+          "actions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ActionDefinition"
+            },
+            "title": "[\"action_name\"] => ActionDefinition"
+          },
+          "references": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RelationalReference"
+            },
+            "title": "[\"relation_name or action_name\"] => RelationalReference"
+          },
+          "option": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "EntityDefinition"
+      },
+      "EntityFilter": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "EntityFilter is used to filter entities"
+      },
+      "Expand": {
+        "type": "object",
+        "properties": {
+          "expand": {
+            "$ref": "#/components/schemas/ExpandTreeNode"
+          },
+          "leaf": {
+            "$ref": "#/components/schemas/v1.Result"
+          }
+        },
+        "title": "Expand"
+      },
+      "ExpandTreeNode": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "$ref": "#/components/schemas/ExpandTreeNode.Operation"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expand"
+            }
+          }
+        },
+        "title": "ExpandTreeNode"
+      },
+      "ExpandTreeNode.Operation": {
+        "type": "string",
+        "enum": [
+          "OPERATION_UNSPECIFIED",
+          "OPERATION_UNION",
+          "OPERATION_INTERSECTION"
+        ],
+        "default": "OPERATION_UNSPECIFIED",
+        "title": "Operation"
+      },
+      "IndexedSchema": {
+        "type": "object",
+        "properties": {
+          "entityDefinitions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EntityDefinition"
+            }
+          },
+          "relationDefinitions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RelationDefinition"
+            },
+            "title": "[\"entity_name#relation_name\"] => RelationDefinition"
+          },
+          "actionDefinitions": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ActionDefinition"
+            },
+            "title": "[\"entity_name#action_name\"] => ActionDefinition"
+          }
+        },
+        "title": "IndexedSchema"
+      },
+      "Leaf": {
+        "type": "object",
+        "properties": {
+          "exclusion": {
+            "type": "boolean"
+          },
+          "computedUserSet": {
+            "$ref": "#/components/schemas/ComputedUserSet"
+          },
+          "tupleToUserSet": {
+            "$ref": "#/components/schemas/TupleToUserSet"
+          }
+        },
+        "title": "Leaf"
+      },
+      "PermissionCheckRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          },
+          "snap_token": {
+            "type": "string"
+          },
+          "exclusion": {
+            "type": "boolean"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "title": "PermissionCheckRequestMetadata"
+      },
+      "PermissionCheckResponse": {
+        "type": "object",
+        "properties": {
+          "can": {
+            "$ref": "#/components/schemas/PermissionCheckResponse.Result"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/PermissionCheckResponseMetadata"
+          }
+        },
+        "title": "PermissionCheckResponse"
+      },
+      "PermissionCheckResponse.Result": {
+        "type": "string",
+        "enum": [
+          "RESULT_UNKNOWN",
+          "RESULT_ALLOWED",
+          "RESULT_DENIED"
+        ],
+        "default": "RESULT_UNKNOWN",
+        "title": "Result"
+      },
+      "PermissionCheckResponseMetadata": {
+        "type": "object",
+        "properties": {
+          "check_count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "title": "CheckResponseMetadata"
+      },
+      "PermissionExpandRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          },
+          "snap_token": {
+            "type": "string"
+          }
+        },
+        "title": "PermissionExpandRequestMetadata"
+      },
+      "PermissionExpandResponse": {
+        "type": "object",
+        "properties": {
+          "tree": {
+            "$ref": "#/components/schemas/Expand"
+          }
+        },
+        "title": "PermissionExpandResponse"
+      },
+      "PermissionLookupEntityRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          },
+          "snap_token": {
+            "type": "string"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "title": "PermissionLookupEntityRequestMetadata"
+      },
+      "PermissionLookupEntityResponse": {
+        "type": "object",
+        "properties": {
+          "entity_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "PermissionLookupEntityResponse"
+      },
+      "PermissionLookupEntityStreamResponse": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          }
+        },
+        "title": "PermissionLookupEntityStreamResponse"
+      },
+      "PermissionLookupSchemaRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          }
+        },
+        "title": "PermissionLookupSchemaRequestMetadata"
+      },
+      "PermissionLookupSchemaResponse": {
+        "type": "object",
+        "properties": {
+          "action_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "PermissionLookupSchemaResponse"
+      },
+      "RelationDefinition": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "entityReference": {
+            "$ref": "#/components/schemas/RelationReference"
+          },
+          "relationReferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelationReference"
+            },
+            "title": "relation reference includes entity reference"
+          },
+          "option": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "title": "RelationDefinition"
+      },
+      "RelationReference": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "title": "RelationReference"
+      },
+      "RelationalReference": {
+        "type": "string",
+        "enum": [
+          "RELATIONAL_REFERENCE_UNSPECIFIED",
+          "RELATIONAL_REFERENCE_RELATION",
+          "RELATIONAL_REFERENCE_ACTION"
+        ],
+        "default": "RELATIONAL_REFERENCE_UNSPECIFIED",
+        "title": "RelationalReference"
+      },
+      "RelationshipDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "snap_token": {
+            "type": "string"
+          }
+        },
+        "title": "RelationshipDeleteResponse"
+      },
+      "RelationshipReadRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "snap_token": {
+            "type": "string"
+          }
+        },
+        "title": "RelationshipWriteRequestMetadata"
+      },
+      "RelationshipReadResponse": {
+        "type": "object",
+        "properties": {
+          "tuples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tuple"
+            }
+          },
+          "continuous_token": {
+            "type": "string"
+          }
+        },
+        "title": "RelationshipReadResponse"
+      },
+      "RelationshipWriteRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          }
+        },
+        "title": "RelationshipWriteRequestMetadata"
+      },
+      "RelationshipWriteResponse": {
+        "type": "object",
+        "properties": {
+          "snap_token": {
+            "type": "string"
+          }
+        },
+        "title": "RelationshipWriteResponse"
+      },
+      "Rewrite": {
+        "type": "object",
+        "properties": {
+          "rewriteOperation": {
+            "$ref": "#/components/schemas/Rewrite.Operation"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Child"
+            }
+          }
+        },
+        "title": "Rewrite"
+      },
+      "Rewrite.Operation": {
+        "type": "string",
+        "enum": [
+          "OPERATION_UNSPECIFIED",
+          "OPERATION_UNION",
+          "OPERATION_INTERSECTION"
+        ],
+        "default": "OPERATION_UNSPECIFIED",
+        "title": "Operation"
+      },
+      "SchemaReadRequestMetadata": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          }
+        },
+        "title": "SchemaReadRequestMetadata"
+      },
+      "SchemaReadResponse": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "$ref": "#/components/schemas/IndexedSchema"
+          }
+        },
+        "title": "SchemaReadRequest"
+      },
+      "SchemaWriteResponse": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string"
+          }
+        },
+        "title": "SchemaWriteResponse"
+      },
+      "Socials": {
+        "type": "object",
+        "properties": {
+          "discord": {
+            "type": "string"
+          },
+          "twitter": {
+            "type": "string"
+          },
+          "linkedin": {
+            "type": "string"
+          }
+        }
+      },
+      "Sources": {
+        "type": "object",
+        "properties": {
+          "docs": {
+            "type": "string"
+          },
+          "gitHub": {
+            "type": "string"
+          },
+          "blog": {
+            "type": "string"
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Any"
+            }
+          }
+        }
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string"
+          }
+        },
+        "title": "Subject"
+      },
+      "SubjectFilter": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "relation": {
+            "type": "string"
+          }
+        },
+        "title": "SubjectFilter is used to filter subjects"
+      },
+      "Tenant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "title": "Tenant"
+      },
+      "TenantCreateRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "title": "TenantCreateRequest"
+      },
+      "TenantCreateResponse": {
+        "type": "object",
+        "properties": {
+          "tenant": {
+            "$ref": "#/components/schemas/Tenant"
+          }
+        },
+        "title": "TenantCreateResponse"
+      },
+      "TenantDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "tenant": {
+            "$ref": "#/components/schemas/Tenant"
+          }
+        },
+        "title": "TenantDeleteResponse"
+      },
+      "TenantListRequest": {
+        "type": "object",
+        "properties": {
+          "page_size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "continuous_token": {
+            "type": "string"
+          }
+        },
+        "title": "TenantListRequest"
+      },
+      "TenantListResponse": {
+        "type": "object",
+        "properties": {
+          "tenants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tenant"
+            }
+          },
+          "continuous_token": {
+            "type": "string"
+          }
+        },
+        "title": "TenantListResponse"
+      },
+      "Tuple": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Entity"
+          },
+          "relation": {
+            "type": "string"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/Subject"
+          }
+        },
+        "title": "Tuple"
+      },
+      "TupleFilter": {
+        "type": "object",
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/EntityFilter"
+          },
+          "relation": {
+            "type": "string"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/SubjectFilter"
+          }
+        },
+        "title": "TupleFilter is used to filter tuples"
+      },
+      "TupleSet": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string"
+          }
+        },
+        "title": "TupleSet"
+      },
+      "TupleToUserSet": {
+        "type": "object",
+        "properties": {
+          "tupleSet": {
+            "$ref": "#/components/schemas/TupleSet"
+          },
+          "computed": {
+            "$ref": "#/components/schemas/ComputedUserSet"
+          }
+        },
+        "title": "TupleToUserSet"
+      },
+      "v1.Result": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "$ref": "#/components/schemas/EntityAndRelation"
+          },
+          "exclusion": {
+            "type": "boolean"
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          }
+        },
+        "title": "Result"
+      },
+      "welcomeResponse": {
+        "type": "object",
+        "properties": {
+          "permify": {
+            "type": "string"
+          },
+          "sources": {
+            "$ref": "#/components/schemas/Sources"
+          },
+          "socials": {
+            "$ref": "#/components/schemas/Socials"
+          }
+        },
+        "title": "WelcomeResponse"
+      }
+    }
+  }
+}
