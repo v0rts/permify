@@ -1,11 +1,11 @@
 package schema
 
 import (
-	`errors`
+	"errors"
 
-	`github.com/Permify/permify/pkg/dsl/utils`
+	"github.com/Permify/permify/pkg/dsl/utils"
 
-	base `github.com/Permify/permify/pkg/pb/base/v1`
+	base "github.com/Permify/permify/pkg/pb/base/v1"
 )
 
 // ConnectedSchemaGraph -
@@ -40,7 +40,7 @@ func (re Entrypoint) EntrypointKind() EntrypointKind {
 }
 
 // RelationshipEntryPoints - find the entrypoints
-func (g *ConnectedSchemaGraph) RelationshipEntryPoints(target *base.RelationReference, source *base.RelationReference) ([]Entrypoint, error) {
+func (g *ConnectedSchemaGraph) RelationshipEntryPoints(target, source *base.RelationReference) ([]Entrypoint, error) {
 	entries, err := g.findEntryPoint(target, source, map[string]struct{}{})
 	if err != nil {
 		return nil, err
@@ -50,8 +50,7 @@ func (g *ConnectedSchemaGraph) RelationshipEntryPoints(target *base.RelationRefe
 }
 
 // findEntryPoint - find the entrypoint
-func (g *ConnectedSchemaGraph) findEntryPoint(target *base.RelationReference, source *base.RelationReference, visited map[string]struct{}) ([]Entrypoint, error) {
-
+func (g *ConnectedSchemaGraph) findEntryPoint(target, source *base.RelationReference, visited map[string]struct{}) ([]Entrypoint, error) {
 	key := utils.Key(target.GetType(), target.GetRelation())
 	if _, ok := visited[key]; ok {
 		return nil, nil
@@ -79,8 +78,7 @@ func (g *ConnectedSchemaGraph) findEntryPoint(target *base.RelationReference, so
 }
 
 // findDirectEntryPoint - find the direct entrypoint
-func (g *ConnectedSchemaGraph) findRelationEntryPoint(target *base.RelationReference, source *base.RelationReference, visited map[string]struct{}) ([]Entrypoint, error) {
-
+func (g *ConnectedSchemaGraph) findRelationEntryPoint(target, source *base.RelationReference, visited map[string]struct{}) ([]Entrypoint, error) {
 	var res []Entrypoint
 
 	entity, ok := g.schema.EntityDefinitions[target.GetType()]
@@ -117,7 +115,7 @@ func (g *ConnectedSchemaGraph) findRelationEntryPoint(target *base.RelationRefer
 }
 
 // findEntryPointWithLeaf - find entrypoint with leaf
-func (g *ConnectedSchemaGraph) findEntryPointWithLeaf(target *base.RelationReference, source *base.RelationReference, leaf *base.Leaf, visited map[string]struct{}) ([]Entrypoint, error) {
+func (g *ConnectedSchemaGraph) findEntryPointWithLeaf(target, source *base.RelationReference, leaf *base.Leaf, visited map[string]struct{}) ([]Entrypoint, error) {
 	switch t := leaf.GetType().(type) {
 	case *base.Leaf_TupleToUserSet:
 		tupleSet := t.TupleToUserSet.GetTupleSet().GetRelation()
@@ -128,7 +126,6 @@ func (g *ConnectedSchemaGraph) findEntryPointWithLeaf(target *base.RelationRefer
 		relations := g.schema.EntityDefinitions[target.GetType()].Relations[tupleSet]
 
 		for _, rel := range relations.GetRelationReferences() {
-
 			if rel.GetType() == source.GetType() && source.GetRelation() == computedUserSet {
 				res = append(res, Entrypoint{
 					Kind: TupleToUserSetEntrypoint,

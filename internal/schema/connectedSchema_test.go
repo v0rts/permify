@@ -4,15 +4,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	`github.com/Permify/permify/pkg/dsl/compiler`
-	`github.com/Permify/permify/pkg/dsl/parser`
-	base `github.com/Permify/permify/pkg/pb/base/v1`
+	"github.com/Permify/permify/pkg/dsl/compiler"
+	"github.com/Permify/permify/pkg/dsl/parser"
+	base "github.com/Permify/permify/pkg/pb/base/v1"
 )
 
 var _ = Describe("connected schema", func() {
-
 	Context("connected schema", func() {
-
 		It("Case 1", func() {
 			sch, err := parser.NewParser(`
 			entity user {}
